@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tamil Content X-Ray</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Tamil:wght@400;600;700&family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0d12; --surface: #14141e; --card: #1a1a28; --border: #2a2a40;
+  --text: #e8e6f0; --muted: #7a788a; --accent: #c084fc; --accent2: #818cf8;
+  --person: #60a5fa; --person-bg: rgba(96,165,250,0.12);
+  --place: #34d399;  --place-bg: rgba(52,211,153,0.12);
+  --org: #fb923c;    --org-bg: rgba(251,146,60,0.12);
+  --myth: #f87171;   --myth-bg: rgba(248,113,113,0.12);
+  --cultural: #fbbf24; --cultural-bg: rgba(251,191,36,0.12);
+  --literature: #a78bfa; --literature-bg: rgba(167,139,250,0.12);
+  --festival: #f472b6; --festival-bg: rgba(244,114,182,0.12);
+  --food: #4ade80;     --food-bg: rgba(74,222,128,0.12);
+  --dynasty: #e879f9;  --dynasty-bg: rgba(232,121,249,0.12);
+  --warn: #f59e0b;   --warn-bg: rgba(245,158,11,0.1);
+  --success: #34d399; --success-bg: rgba(52,211,153,0.08);
+  --error: #f87171;  --error-bg: rgba(248,113,113,0.1);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(192,132,252,0.07) 0%,transparent 70%);top:-200px;left:-200px;pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(129,140,248,0.06) 0%,transparent 70%);bottom:-150px;right:-100px;pointer-events:none;z-index:0;}
+.app{max-width:960px;margin:0 auto;padding:40px 24px;position:relative;z-index:1;}
+
+/* Header */
+header{text-align:center;margin-bottom:48px;}
+.logo-badge{display:inline-flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);padding:6px 16px 6px 10px;border-radius:100px;font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;margin-bottom:24px;}
+.logo-badge .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(1.3);}}
+h1{font-family:'Playfair Display',serif;font-size:clamp(34px,6vw,58px);font-weight:900;line-height:1.1;background:linear-gradient(135deg,#e8e6f0 0%,#c084fc 50%,#818cf8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px;}
+.tamil-title{font-family:'Noto Serif Tamil',serif;font-size:20px;color:var(--muted);margin-bottom:14px;}
+.tagline{font-size:15px;color:var(--muted);max-width:540px;margin:0 auto;line-height:1.6;}
+
+/* Legend */
+.legend{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:32px;}
+.legend-item{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;font-size:12px;font-weight:500;}
+.legend-item .dot{width:8px;height:8px;border-radius:50%;}
+.l-person{background:var(--person-bg);color:var(--person);} .l-person .dot{background:var(--person);}
+.l-place{background:var(--place-bg);color:var(--place);} .l-place .dot{background:var(--place);}
+.l-org{background:var(--org-bg);color:var(--org);} .l-org .dot{background:var(--org);}
+.l-myth{background:var(--myth-bg);color:var(--myth);} .l-myth .dot{background:var(--myth);}
+.l-cultural{background:var(--cultural-bg);color:var(--cultural);} .l-cultural .dot{background:var(--cultural);}
+.l-literature{background:var(--literature-bg);color:var(--literature);} .l-literature .dot{background:var(--literature);}
+.l-festival{background:var(--festival-bg);color:var(--festival);} .l-festival .dot{background:var(--festival);}
+.l-food{background:var(--food-bg);color:var(--food);} .l-food .dot{background:var(--food);}
+.l-dynasty{background:var(--dynasty-bg);color:var(--dynasty);} .l-dynasty .dot{background:var(--dynasty);}
+
+/* Input Card */
+.input-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;margin-bottom:16px;transition:border-color .3s;}
+.input-card:focus-within{border-color:rgba(192,132,252,.4);}
+.input-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;}
+.input-label{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;}
+.toggle-group{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;}
+.toggle-btn{padding:6px 14px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.toggle-btn.active{background:var(--card);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.4);}
+textarea{width:100%;min-height:140px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;color:var(--text);font-size:17px;line-height:1.8;resize:vertical;outline:none;transition:border-color .2s;font-family:'Noto Serif Tamil','DM Sans',sans-serif;}
+textarea::placeholder{color:var(--muted);font-family:'DM Sans',sans-serif;font-size:15px;}
+textarea:focus{border-color:rgba(192,132,252,.5);}
+.input-footer{display:flex;justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:12px;}
+.sample-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.sample-btn{padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:11px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.sample-btn:hover{border-color:var(--accent);color:var(--accent);}
+.analyze-btn{display:flex;align-items:center;gap:8px;padding:12px 28px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:12px;color:white;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.analyze-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(192,132,252,.3);}
+.analyze-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.analyze-btn .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .8s linear infinite;display:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.analyze-btn.loading .spinner{display:block;}
+.analyze-btn.loading .btn-text{display:none;}
+
+/* Banners */
+.banner{display:flex;align-items:flex-start;gap:10px;padding:12px 16px;border-radius:12px;font-size:13px;margin-bottom:12px;}
+.banner-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.banner-body{flex:1;}
+.banner-title{font-weight:700;margin-bottom:4px;}
+.banner-detail{line-height:1.6;opacity:.85;}
+.banner.warn{background:var(--warn-bg);border:1px solid rgba(245,158,11,.3);color:var(--warn);}
+.banner.success{background:var(--success-bg);border:1px solid rgba(52,211,153,.25);color:var(--success);}
+.banner.info{background:rgba(192,132,252,.08);border:1px solid rgba(192,132,252,.2);color:var(--accent);}
+.spell-correction{display:inline-flex;align-items:center;gap:4px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:6px;padding:2px 8px;margin:2px;font-size:12px;font-family:'Noto Serif Tamil',serif;}
+.spell-arrow{font-size:10px;opacity:.7;}
+
+/* Result Card */
+.result-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;margin-bottom:20px;display:none;animation:fadeUp .4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.result-card.visible{display:block;}
+.result-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.section-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.entity-count{font-size:12px;font-weight:600;color:var(--accent);background:rgba(192,132,252,.1);padding:4px 10px;border-radius:100px;}
+.analyzed-text{font-family:'Noto Serif Tamil',serif;font-size:19px;line-height:2;color:var(--text);padding:20px;background:var(--surface);border-radius:12px;word-break:break-word;white-space:pre-wrap;}
+.entity-tag{display:inline;padding:2px 6px;border-radius:5px;cursor:pointer;font-weight:600;transition:all .15s;}
+.entity-tag:hover{filter:brightness(1.2);transform:scale(1.03);}
+.entity-PERSON{color:var(--person);background:var(--person-bg);}
+.entity-PLACE{color:var(--place);background:var(--place-bg);}
+.entity-ORGANIZATION{color:var(--org);background:var(--org-bg);}
+.entity-MYTH{color:var(--myth);background:var(--myth-bg);}
+.entity-CULTURAL{color:var(--cultural);background:var(--cultural-bg);}
+.entity-LITERATURE{color:var(--literature);background:var(--literature-bg);}
+.entity-FESTIVAL{color:var(--festival);background:var(--festival-bg);}
+.entity-FOOD{color:var(--food);background:var(--food-bg);}
+.entity-DYNASTY{color:var(--dynasty);background:var(--dynasty-bg);}
+.entities-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:24px;}
+.entity-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.entity-card:hover{transform:translateY(-2px);border-color:rgba(192,132,252,.3);}
+.entity-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+.entity-card.PERSON::before{background:var(--person);}
+.entity-card.PLACE::before{background:var(--place);}
+.entity-card.ORGANIZATION::before{background:var(--org);}
+.entity-card.MYTH::before{background:var(--myth);}
+.entity-card.CULTURAL::before{background:var(--cultural);}
+.entity-card.LITERATURE::before{background:var(--literature);}
+.entity-card.FESTIVAL::before{background:var(--festival);}
+.entity-card.FOOD::before{background:var(--food);}
+.entity-card.DYNASTY::before{background:var(--dynasty);}
+.ecard-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
+.ecard-word{font-family:'Noto Serif Tamil',serif;font-size:18px;font-weight:700;}
+.ecard-type{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:100px;flex-shrink:0;}
+.PERSON .ecard-type{background:var(--person-bg);color:var(--person);}
+.PLACE .ecard-type{background:var(--place-bg);color:var(--place);}
+.ORGANIZATION .ecard-type{background:var(--org-bg);color:var(--org);}
+.MYTH .ecard-type{background:var(--myth-bg);color:var(--myth);}
+.CULTURAL .ecard-type{background:var(--cultural-bg);color:var(--cultural);}
+.LITERATURE .ecard-type{background:var(--literature-bg);color:var(--literature);}
+.FESTIVAL .ecard-type{background:var(--festival-bg);color:var(--festival);}
+.FOOD .ecard-type{background:var(--food-bg);color:var(--food);}
+.DYNASTY .ecard-type{background:var(--dynasty-bg);color:var(--dynasty);}
+.ecard-en{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:6px;}
+.ecard-ta{font-family:'Noto Serif Tamil',serif;font-size:13px;color:var(--muted);line-height:1.5;opacity:.8;}
+.ecard-more{font-size:11px;color:var(--accent);margin-top:8px;font-weight:600;}
+
+/* Meaning Section */
+.meaning-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;margin-bottom:20px;display:none;animation:fadeUp .4s ease;}
+.meaning-card.visible{display:block;}
+.meaning-header{margin-bottom:20px;}
+.meaning-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;}
+.meaning-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--text);}
+.content-type-badge{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 12px;border-radius:100px;background:rgba(192,132,252,.12);color:var(--accent);}
+.overall-meaning{font-size:15px;line-height:1.7;color:var(--muted);padding:16px;background:var(--surface);border-radius:12px;margin-bottom:20px;}
+.overall-meaning strong{color:var(--text);display:block;margin-bottom:6px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;}
+
+/* Line by line */
+.lines-container{display:flex;flex-direction:column;gap:14px;}
+.line-block{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.line-number{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:rgba(192,132,252,.15);border-radius:50%;font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0;}
+.line-header{padding:14px 16px 10px;border-bottom:1px solid var(--border);}
+.line-tamil{font-family:'Noto Serif Tamil',serif;font-size:18px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.line-translit{font-size:12px;color:var(--muted);font-style:italic;letter-spacing:.02em;}
+.line-body{padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.line-meaning-block{}
+.line-meaning-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px;}
+.line-meaning-en{font-size:14px;line-height:1.6;color:var(--text);}
+.line-meaning-ta{font-family:'Noto Serif Tamil',serif;font-size:14px;line-height:1.7;color:var(--text);opacity:.85;}
+
+/* Fun fact & context */
+.extra-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px;}
+.extra-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;}
+.extra-card-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;}
+.extra-card-text{font-size:14px;line-height:1.7;color:var(--text);}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:100;display:none;align-items:center;justify-content:center;padding:24px;}
+.modal-overlay.open{display:flex;animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px;max-width:560px;width:100%;max-height:80vh;overflow-y:auto;position:relative;animation:slideUp .25s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.modal-close{position:absolute;top:16px;right:16px;background:var(--surface);border:1px solid var(--border);color:var(--muted);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .15s;}
+.modal-close:hover{color:var(--text);border-color:var(--accent);}
+.modal-word{font-family:'Noto Serif Tamil',serif;font-size:32px;font-weight:700;margin-bottom:4px;}
+.modal-type{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:20px;}
+.modal-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px;margin-top:16px;}
+.modal-text{font-size:15px;line-height:1.7;color:var(--text);}
+.modal-text-ta{font-family:'Noto Serif Tamil',serif;font-size:15px;line-height:1.8;color:var(--text);opacity:.85;}
+.modal-deep-btn{margin-top:20px;width:100%;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.modal-deep-btn:hover{border-color:var(--accent);background:rgba(192,132,252,.08);}
+.modal-deep-content{margin-top:16px;font-size:14px;line-height:1.8;color:var(--muted);display:none;}
+.modal-deep-content.loaded{display:block;color:var(--text);}
+
+/* Error */
+.error-box{padding:16px 20px;background:var(--error-bg);border:1px solid rgba(248,113,113,.3);border-radius:12px;color:var(--error);font-size:14px;display:none;margin-top:16px;line-height:1.6;}
+.error-box.visible{display:block;}
+
+footer{text-align:center;padding:40px 0 20px;color:var(--muted);font-size:12px;line-height:1.8;}
+footer .ta{font-family:'Noto Serif Tamil',serif;font-size:13px;}
+
+@media(max-width:640px){
+  .line-body{grid-template-columns:1fr;}
+  .extra-cards{grid-template-columns:1fr;}
+  .input-footer{flex-direction:column;align-items:stretch;}
+  .analyze-btn{justify-content:center;}
+  .entities-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header>
+  <div class="logo-badge"><span class="dot"></span>AI-Powered Tamil NER</div>
+  <h1>Tamil Content X-Ray</h1>
+  <div class="tamil-title">தமிழ் உள்ளடக்க எக்ஸ்-ரே</div>
+  <p class="tagline">Paste any Tamil text — verse, poem, paragraph, or Tanglish — and instantly see every entity, spelling correction, and line-by-line meaning.</p>
+</header>
+
+<div class="legend">
+  <div class="legend-item l-person"><span class="dot"></span>Person</div>
+  <div class="legend-item l-place"><span class="dot"></span>Place</div>
+  <div class="legend-item l-org"><span class="dot"></span>Organization</div>
+  <div class="legend-item l-myth"><span class="dot"></span>Mythology</div>
+  <div class="legend-item l-cultural"><span class="dot"></span>Cultural</div>
+  <div class="legend-item l-literature"><span class="dot"></span>Literature</div>
+  <div class="legend-item l-festival"><span class="dot"></span>Festival</div>
+  <div class="legend-item l-food"><span class="dot"></span>Food</div>
+  <div class="legend-item l-dynasty"><span class="dot"></span>Dynasty</div>
+</div>
+
+<div class="input-card">
+  <div class="input-header">
+    <span class="input-label">Enter Tamil Text</span>
+    <div class="toggle-group">
+      <button class="toggle-btn active" id="btn-tamil" onclick="setMode('tamil')">Tamil Script</button>
+      <button class="toggle-btn" id="btn-tanglish" onclick="setMode('tanglish')">Tanglish</button>
+    </div>
+  </div>
+  <textarea id="inputText" placeholder="Paste Tamil text, verse, poem, or paragraph here..."></textarea>
+  <div class="input-footer">
+    <div class="sample-btns">
+      <span style="font-size:11px;color:var(--muted);line-height:32px;margin-right:4px;">Samples:</span>
+      <button class="sample-btn" onclick="loadSample('kural')">Thirukkural</button>
+      <button class="sample-btn" onclick="loadSample('sangam')">Sangam Poem</button>
+      <button class="sample-btn" onclick="loadSample('kamban')">Kamban</button>
+      <button class="sample-btn" onclick="loadSample('para')">Paragraph</button>
+      <button class="sample-btn" onclick="loadSample('tanglish')">Tanglish</button>
+    </div>
+    <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">
+      <span class="btn-text">⚡ X-Ray Analysis</span>
+      <span class="spinner"></span>
+    </button>
+  </div>
+</div>
+
+<div class="error-box" id="errorBox"></div>
+
+<!-- Spell check banners -->
+<div id="spellBanners"></div>
+
+<!-- Meaning Card -->
+<div class="meaning-card" id="meaningCard">
+  <div class="meaning-header">
+    <div class="meaning-title-row">
+      <div class="meaning-title" id="meaningTitle"></div>
+      <div class="content-type-badge" id="contentTypeBadge"></div>
+    </div>
+  </div>
+  <div class="overall-meaning" id="overallMeaning"></div>
+  <div class="section-label" style="margin-bottom:14px;">Line-by-Line Meaning</div>
+  <div class="lines-container" id="linesContainer"></div>
+  <div class="extra-cards" id="extraCards"></div>
+</div>
+
+<!-- NER Result Card -->
+<div class="result-card" id="resultCard">
+  <div class="result-header">
+    <span class="section-label">Highlighted Text with Entities</span>
+    <span class="entity-count" id="entityCount"></span>
+  </div>
+  <div class="analyzed-text" id="analyzedText"></div>
+  <div class="entities-grid" id="entitiesGrid"></div>
+</div>
+
+<footer>
+  <div class="ta">தமிழ் — உலகின் பழமையான செம்மொழி</div>
+  Tamil Content X-Ray · AI-Powered Entity Recognition for Tamil Learners
+</footer>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-close" onclick="closeModalDirect()">✕</div>
+    <div class="modal-word" id="modalWord"></div>
+    <div class="modal-type" id="modalType"></div>
+    <div class="modal-section-title">English Explanation</div>
+    <div class="modal-text" id="modalEn"></div>
+    <div class="modal-section-title">தமிழ் விளக்கம்</div>
+    <div class="modal-text-ta" id="modalTa"></div>
+    <button class="modal-deep-btn" id="deepBtn" onclick="loadDeep()">📚 Learn More (Deep Dive)</button>
+    <div class="modal-deep-content" id="deepContent"></div>
+  </div>
+</div>
+
+<script>
+const SAMPLES = {
+  kural: {
+    text: `அகர முதல எழுத்தெல்லாம் ஆதி
+பகவன் முதற்றே உலகு`,
+    mode: "tamil"
+  },
+  sangam: {
+    text: `யாயும் ஞாயும் யாரா கியரோ
+எந்தையும் நுந்தையும் எம்முறைக் கேளிர்
+யானும் நீயும் எவ்வழி யறிதும்
+செம்புலப் பெயனீர் போல
+அன்புடை நெஞ்சம் தாங்கலந் தனவே`,
+    mode: "tamil"
+  },
+  kamban: {
+    text: `கம்பன் இராமாயணம் எழுதிய போது இலங்கையில் இராவணன் ஆட்சி செய்தான். சீதையை தேடி அனுமன் இலங்கை சென்றான். திருவள்ளுவர் எழுதிய திருக்குறள் தமிழ் இலக்கியத்தின் மகுடம்.`,
+    mode: "tamil"
+  },
+  para: {
+    text: `சுப்பிரமணிய பாரதியார் தமிழ்நாட்டின் புகழ்பெற்ற கவிஞர். அவர் சென்னையில் வாழ்ந்து இந்தியாவிற்காக சுதந்திரப் பாடல்கள் எழுதினார். தமிழ்நாடு அரசு அவரது பாடல்களை பாடசாலைகளில் கற்பிக்கிறது. அண்ணா பல்கலைக்கழகம் அவரது படைப்புகளை போற்றுகிறது.`,
+    mode: "tamil"
+  },
+  tanglish: {
+    text: "kamban ramayanam ezhuthiya pothu ilangaiyil raavanan aatchi seithaan. thiruvalluvar thirukkural ezhuthiyavar.",
+    mode: "tanglish"
+  }
+};
+
+let currentMode = "tamil";
+let currentEntities = [];
+let currentText = "";
+let activeEntity = null;
+
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById("btn-tamil").classList.toggle("active", mode === "tamil");
+  document.getElementById("btn-tanglish").classList.toggle("active", mode === "tanglish");
+  const ta = document.getElementById("inputText");
+  ta.placeholder = mode === "tanglish"
+    ? "Type Tanglish here... e.g. kamban ramayanam ezhuthiya pothu..."
+    : "Paste Tamil text, verse, poem, or paragraph here...";
+  ta.style.fontFamily = mode === "tanglish" ? "'DM Sans',sans-serif" : "'Noto Serif Tamil',serif";
+}
+
+function loadSample(key) {
+  const s = SAMPLES[key];
+  setMode(s.mode);
+  document.getElementById("inputText").value = s.text;
+}
+
+async function analyze() {
+  const text = document.getElementById("inputText").value.trim();
+  if (!text) { showError("Please enter some Tamil text first!"); return; }
+
+  const btn = document.getElementById("analyzeBtn");
+  btn.disabled = true;
+  btn.classList.add("loading");
+  hideError();
+  document.getElementById("spellBanners").innerHTML = "";
+  document.getElementById("resultCard").classList.remove("visible");
+  document.getElementById("meaningCard").classList.remove("visible");
+
+  try {
+    const res = await fetch("/api/analyze", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({text, is_tanglish: currentMode === "tanglish"})
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    currentEntities = data.entities || [];
+    currentText = data.corrected_text;
+
+    renderBanners(data);
+    renderMeaning(data);
+    // Only show entities for sentence and paragraph
+    if (data.content_type === "sentence" || data.content_type === "paragraph") {
+      renderNER(data);
+    } else {
+      document.getElementById("resultCard").classList.remove("visible");
+    }
+
+  } catch(err) {
+    showError("Error: " + err.message + "\n\nMake sure Flask server is running and GEMINI_API_KEY is set.");
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove("loading");
+  }
+}
+
+function renderBanners(data) {
+  const container = document.getElementById("spellBanners");
+  let html = "";
+
+  // Tanglish conversion banner
+  if (data.was_tanglish) {
+    html += `<div class="banner info">
+      <span class="banner-icon">🔄</span>
+      <div class="banner-body">
+        <div class="banner-title">Tanglish Converted to Tamil Script</div>
+        <div class="banner-detail">Your Tanglish input was converted to Tamil script before analysis.</div>
+      </div>
+    </div>`;
+  }
+
+  // Spell check banner
+  if (data.vaani_active) {
+    const corrections = data.corrections || [];
+    if (corrections.length > 0) {
+      const pills = corrections.map(c =>
+        `<span class="spell-correction">${c.original}<span class="spell-arrow">→</span>${c.corrected}</span>`
+      ).join(" ");
+      html += `<div class="banner warn">
+        <span class="banner-icon">⚠️</span>
+        <div class="banner-body">
+          <div class="banner-title">Vaani Spellcheck: ${corrections.length} spelling mistake${corrections.length>1?'s':''} found and corrected</div>
+          <div class="banner-detail">${pills}</div>
+        </div>
+      </div>`;
+    } else {
+      html += `<div class="banner success">
+        <span class="banner-icon">✅</span>
+        <div class="banner-body">
+          <div class="banner-title">Vaani Spellcheck: No spelling mistakes found</div>
+          <div class="banner-detail">Your Tamil text passed the Vaani spellcheck successfully.</div>
+        </div>
+      </div>`;
+    }
+  }
+
+  container.innerHTML = html;
+}
+
+function renderMeaning(data) {
+  const m = data.meaning;
+  const card = document.getElementById("meaningCard");
+
+  // Sentence/paragraph = no meaning card
+  if (!m || data.content_type === "sentence" || data.content_type === "paragraph") {
+    card.classList.remove("visible");
+    return;
+  }
+
+  const mode = m.mode || data.content_type;
+  document.getElementById("meaningTitle").textContent = "";
+  document.getElementById("meaningTitle").style.display = "none";
+  const era = m.literary_era || "";
+  const vtype = m.verse_type || "";
+  const badge = mode === "couplet"
+    ? (era ? "✦ " + era + " COUPLET" : "✦ TAMIL COUPLET")
+    : (era ? "📜 " + era + (vtype ? " — " + vtype : "") : "📜 VERSE / POEM");
+  document.getElementById("contentTypeBadge").textContent = badge;
+
+  // Overall meaning (both modes)
+  const om = document.getElementById("overallMeaning");
+  om.innerHTML = `<strong>Overall Meaning (English)</strong>${m.overall_meaning || ""}
+    ${m.overall_meaning_ta ? `<br><br><strong style="font-family:'Noto Serif Tamil',serif">முழு விளக்கம் (தமிழில்)</strong><br><span style="font-family:'Noto Serif Tamil',serif">${m.overall_meaning_ta}</span>` : ""}
+    ${m.moral ? `<br><br><strong>💡 Moral</strong><br>${m.moral}` : ""}`;
+
+  const lc = document.getElementById("linesContainer");
+
+  if (mode === "couplet") {
+    // ── KURAL MODE: word-by-word + line-by-line ──────────────────────────────
+    let html = "";
+
+    // Line by line
+    const lines = m.lines || [];
+    if (lines.length > 0) {
+      html += `<div class="section-label" style="margin-bottom:12px;margin-top:4px;">Line by Line</div>`;
+      html += lines.map((l, i) => `
+        <div class="line-block">
+          <div class="line-header">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <span class="line-number">${i+1}</span>
+              <div class="line-tamil">${l.line || ""}</div>
+            </div>
+            ${l.transliteration ? `<div class="line-translit">${l.transliteration}</div>` : ""}
+          </div>
+          <div class="line-body">
+            <div class="line-meaning-block">
+              <div class="line-meaning-label">English</div>
+              <div class="line-meaning-en">${l.meaning_en || ""}</div>
+            </div>
+            <div class="line-meaning-block">
+              <div class="line-meaning-label">தமிழில்</div>
+              <div class="line-meaning-ta">${l.meaning_ta || ""}</div>
+            </div>
+          </div>
+        </div>`).join("");
+    }
+
+    // No word-by-word for kural
+
+    lc.innerHTML = html;
+
+  } else {
+    // ── VERSE MODE: full meaning only ────────────────────────────────────────
+    lc.innerHTML = ""; // no line-by-line for verse
+  }
+
+  // Extra cards (cultural context + fun fact)
+  const ec = document.getElementById("extraCards");
+  let extraHtml = "";
+  if (m.cultural_context) {
+    extraHtml += `<div class="extra-card">
+      <div class="extra-card-label">🏛️ Cultural Context</div>
+      <div class="extra-card-text">${m.cultural_context}</div>
+    </div>`;
+  }
+  if (m.fun_fact) {
+    extraHtml += `<div class="extra-card">
+      <div class="extra-card-label">💡 Fun Fact</div>
+      <div class="extra-card-text">${m.fun_fact}</div>
+    </div>`;
+  }
+  ec.innerHTML = extraHtml;
+
+  card.classList.add("visible");
+  card.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+function renderNER(data) {
+  const card = document.getElementById("resultCard");
+  document.getElementById("entityCount").textContent =
+    `${currentEntities.length} ${currentEntities.length===1?"entity":"entities"} found`;
+
+  // Use corrected_text for display — NER ran on this same text so words will match
+  const displayText = data.corrected_text || data.converted_text || data.original_text;
+  renderHighlightedText(displayText, currentEntities);
+  renderEntityCards(currentEntities);
+  card.classList.add("visible");
+}
+
+// Tamil case suffixes appended to words in sentences
+const TAMIL_SUFFIXES = ["இல்","இன்","உக்கு","ஐ","ஆல்","ஓடு","இடம்","கள்","களை","களில்","களுக்கு","உடன்","என்று","ஆக","ஆன","இலிருந்து","மீது","பற்றி","வரை","தில்","தின்","னில்","னை","னுக்கு"];
+
+function findEntityInText(segments, entityWord) {
+  const plainText = segments.filter(s=>!s.highlighted).map(s=>s.text).join("");
+  // 1. Exact match
+  if (plainText.includes(entityWord)) return entityWord;
+  // 2. Try with common suffixes
+  const base = entityWord.endsWith("்") ? entityWord.slice(0,-1) : entityWord;
+  for (const sfx of TAMIL_SUFFIXES) {
+    if (plainText.includes(base + sfx)) return base + sfx;
+    if (plainText.includes(entityWord + sfx)) return entityWord + sfx;
+  }
+  // 3. Try without trailing virama ்
+  if (base !== entityWord && plainText.includes(base)) return base;
+  return null;
+}
+
+function renderHighlightedText(text, entities) {
+  const el = document.getElementById("analyzedText");
+  // Sort longest first to prevent partial matches
+  const sorted = [...entities].sort((a,b) => b.word.length - a.word.length);
+  let segments = [{ text: text, highlighted: false }];
+
+  for (const ent of sorted) {
+    const actualWord = findEntityInText(segments, ent.word) || ent.word;
+    const escaped = actualWord.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const newSegments = [];
+    for (const seg of segments) {
+      if (seg.highlighted) { newSegments.push(seg); continue; }
+      const parts = seg.text.split(new RegExp("(" + escaped + ")", "g"));
+      for (const part of parts) {
+        if (part === actualWord) {
+          newSegments.push({ text: part, highlighted: true, entity: ent });
+        } else if (part) {
+          newSegments.push({ text: part, highlighted: false });
+        }
+      }
+    }
+    segments = newSegments;
+  }
+
+  el.innerHTML = segments.map(seg => {
+    if (seg.highlighted && seg.entity) {
+      const e = seg.entity;
+      return `<span class="entity-tag entity-${e.type}" onclick="openModal('${escA(e.word)}')" title="${e.type}">${seg.text}</span>`;
+    }
+    return seg.text;
+  }).join("");
+}
+
+function renderEntityCards(entities) {
+  const grid = document.getElementById("entitiesGrid");
+  if (!entities.length) {
+    grid.innerHTML = '<div style="color:var(--muted);font-size:14px;grid-column:1/-1;text-align:center;padding:20px">No named entities detected.</div>';
+    return;
+  }
+  grid.innerHTML = entities.map(ent => `
+    <div class="entity-card ${ent.type}" onclick="openModal('${escA(ent.word)}')">
+      <div class="ecard-header">
+        <div class="ecard-word">${ent.word}</div>
+        <div class="ecard-type">${ent.type}</div>
+      </div>
+      <div class="ecard-en">${ent.explanation_en}</div>
+      <div class="ecard-ta">${ent.explanation_ta}</div>
+      <div class="ecard-more">Click to learn more →</div>
+    </div>
+  `).join('');
+}
+
+function openModal(word) {
+  const ent = currentEntities.find(e => e.word === word);
+  if (!ent) return;
+  activeEntity = ent;
+  const colorMap = {PERSON:'var(--person)',PLACE:'var(--place)',ORGANIZATION:'var(--org)',MYTH:'var(--myth)',CULTURAL:'var(--cultural)',LITERATURE:'var(--literature)',FESTIVAL:'var(--festival)',FOOD:'var(--food)',DYNASTY:'var(--dynasty)'}; const typeDefault = 'var(--accent)';
+  document.getElementById("modalWord").textContent = ent.word;
+  document.getElementById("modalType").textContent = ent.type;
+  document.getElementById("modalType").style.color = colorMap[ent.type]||'var(--accent)';
+  document.getElementById("modalEn").textContent = ent.explanation_en;
+  document.getElementById("modalTa").textContent = ent.explanation_ta;
+  document.getElementById("deepContent").className = "modal-deep-content";
+  document.getElementById("deepContent").textContent = "";
+  document.getElementById("deepBtn").textContent = "📚 Learn More (Deep Dive)";
+  document.getElementById("deepBtn").disabled = false;
+  document.getElementById("modalOverlay").classList.add("open");
+}
+
+function closeModal(e) { if(e.target===document.getElementById("modalOverlay")) closeModalDirect(); }
+function closeModalDirect() { document.getElementById("modalOverlay").classList.remove("open"); }
+document.addEventListener("keydown", e => { if(e.key==="Escape") closeModalDirect(); });
+
+async function loadDeep() {
+  if (!activeEntity) return;
+  const btn = document.getElementById("deepBtn");
+  btn.textContent = "Loading..."; btn.disabled = true;
+  try {
+    const res = await fetch("/api/explain", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({word:activeEntity.word, type:activeEntity.type, context:currentText})
+    });
+    const data = await res.json();
+    const dc = document.getElementById("deepContent");
+    dc.textContent = data.explanation || "No info found.";
+    dc.classList.add("loaded");
+    btn.textContent = "📚 Deep Dive Loaded";
+  } catch(e) {
+    btn.textContent = "Error — try again"; btn.disabled = false;
+  }
+}
+
+function showError(msg) { const el=document.getElementById("errorBox"); el.textContent=msg; el.classList.add("visible"); }
+function hideError() { document.getElementById("errorBox").classList.remove("visible"); }
+function escA(s) { return s.replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+</script>
+</body>
+</html>
