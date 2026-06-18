@@ -122,97 +122,57 @@ tamil-xray/
 
 ---
 
-## Setup & Installation
+## GitHub Repository
 
-### Requirements
-- Python 3.8 or higher
-- Google AI Studio API key (free at aistudio.google.com)
+🔗 **Source Code:** https://github.com/Maleshkumarvelmurugan1982/Tamil-Content-X-Ray-AI-Powered-Entity-Recognition-for-Tamil-Learners
 
-### Step 1 — Install dependencies
+### Clone and Run
+
+**Step 1 — Clone the repository**
+```bash
+git clone https://github.com/Maleshkumarvelmurugan1982/Tamil-Content-X-Ray-AI-Powered-Entity-Recognition-for-Tamil-Learners.git
+cd Tamil-Content-X-Ray-AI-Powered-Entity-Recognition-for-Tamil-Learners
+```
+
+**Step 2 — Install dependencies**
 ```bash
 pip install -r requirements.txt
 pip install tamilinayavaani
 ```
 
-### Step 2 — Get your Gemini API key
+**Step 3 — Get your free Gemini API key**
 - Visit https://aistudio.google.com
 - Sign in with Google account
-- Click "Get API Key" → Create new key → Copy it
+- Click Get API Key → Create new key → Copy it
 
-### Step 3 — Set your API key
+**Step 4 — Set your API key**
 
-**Linux/Mac:**
+Linux/Mac:
 ```bash
 export GEMINI_API_KEY="your-api-key-here"
 ```
 
-**Windows (Command Prompt):**
+Windows (Command Prompt):
 ```cmd
 set GEMINI_API_KEY=your-api-key-here
 ```
 
-**Windows (PowerShell):**
+Windows (PowerShell):
 ```powershell
 $env:GEMINI_API_KEY="your-api-key-here"
 ```
 
-### Step 4 — Run the application
+**Step 5 — Run the application**
 ```bash
 python app.py
 ```
 
-### Step 5 — Open in browser
+**Step 6 — Open in browser**
 ```
 http://localhost:5000
 ```
 
 ---
-
-### GitHub Repository
-
-🔗 Source Code: https://github.com/Maleshkumarvelmurugan1982/Tamil-Content-X-Ray-AI-Powered-Entity-Recognition-for-Tamil-Learners
-
-Clone and Run
-
-Step 1 — Clone the repository
-
-bashgit clone https://github.com/Maleshkumarvelmurugan1982/Tamil-Content-X-Ray-AI-Powered-Entity-Recognition-for-Tamil-Learners.git
-cd Tamil-Content-X-Ray-AI-Powered-Entity-Recognition-for-Tamil-Learners
-
-Step 2 — Install dependencies
-
-bashpip install -r requirements.txt
-pip install tamilinayavaani
-
-Step 3 — Get your free Gemini API key
-
-
-Visit https://aistudio.google.com
-Sign in with Google account
-Click Get API Key → Create new key → Copy it
-
-
-Step 4 — Set your API key
-
-Linux/Mac:
-
-bashexport GEMINI_API_KEY=your-api-key-here
-
-Windows (Command Prompt):
-
-cmdset GEMINI_API_KEY=your-api-key-here
-
-Windows (PowerShell):
-
-powershell$env:GEMINI_API_KEY=your-api-key-here
-
-Step 5 — Run the application
-
-bashpython app.py
-
-Step 6 — Open in browser
-
-http://localhost:5000
 
 ## Sample Test Cases
 
@@ -232,6 +192,7 @@ Expected: DYNASTY, PLACE, FESTIVAL, CULTURAL
 ```
 சுப்பிரமணிய பாரதியார் சென்னையில் வாழ்ந்து இந்தியாவிற்காக சுதந்திரப் பாடல்கள் எழுதினார். தமிழ்நாடு அரசு அவரது பாடல்களை பாடசாலைகளில் கற்பிக்கிறது.
 ```
+Expected: PERSON, PLACE, ORGANIZATION
 
 ### 4. Thirukkural — 2-line Couplet
 ```
@@ -263,6 +224,7 @@ Expected: Full meaning + line-by-line + cultural context
 செம்புலப் பெயனீர் போல
 அன்புடை நெஞ்சம் தாங்கலந் தனவே
 ```
+Expected: Full meaning + line-by-line + cultural context
 
 ### 8. Tanglish Input (switch to Tanglish mode first)
 ```
@@ -324,4 +286,3 @@ Expected: Vaani warns spelling mistake + entity detection
 | **First Name** | Maleshkumar |
 | **Last Name** | V |
 | **Hackathon Title** | Tamil Content X-Ray — AI-Powered Entity Recognition for Tamil Learners |
-
